@@ -949,6 +949,12 @@ class SIPClient:
             self.callCallback(message)  # type: ignore
             response = self.gen_ok(message)
             self.out.sendto(response.encode("utf8"), (self.server, self.port))
+        elif message.method == "OPTIONS":
+            if self.callCallback:
+                response = self.callCallback(message)
+            else:
+                response = self._gen_options_response(message)
+            self.out.sendto(response.encode("utf8"), (self.server, self.port))
         else:
             debug("TODO: Add 400 Error on non processable request")
 
@@ -1573,6 +1579,9 @@ class SIPClient:
         ackMessage += "Content-Length: 0\r\n\r\n"
 
         return ackMessage
+
+    def _gen_options_response(self, request: SIPMessage) -> str:
+        return self.gen_busy(request)
 
     def _gen_response_via_header(self, request: SIPMessage) -> str:
         via = ""
