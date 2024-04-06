@@ -169,6 +169,8 @@ class VoIPCall:
                         codecs[m] = assoc[m]
                 # TODO: If no codecs are compatible then send error to PBX.
 
+                print("Codecs:", codecs)
+
                 port = self.phone.request_port()
                 self.create_rtp_clients(
                     codecs, self.myIP, port, request, i["port"]
@@ -302,6 +304,7 @@ class VoIPCall:
         message = self.sip.gen_answer(
             self.request, self.session_id, m, self.sendmode
         )
+        print('Answer message:', message)
         self.sip.out.sendto(
             message.encode("utf8"), (self.phone.server, self.phone.port)
         )
@@ -563,9 +566,9 @@ class VoIPPhone:
             # CallState.Ringing seems important here to prevent multiple
             # answering and RTP-Client spawning. Find out when renegotiation
             # is relevant.
-            if self.calls[call_id].state != CallState.RINGING:
-                self.calls[call_id].renegotiate(request)
-            return  # Raise Error
+            # if self.calls[call_id].state != CallState.RINGING:
+            #     self.calls[call_id].renegotiate(request)
+            # return  # Raise Error
         if self.callCallback is None:
             message = self.sip.gen_busy(request)
             self.sip.out.sendto(
